@@ -118,3 +118,9 @@ did not use them.
   `src/data.js` built on the cases listed here.
 - Check the documented error codes I could not exercise with one key (403, 429).
 
+
+## LLM use
+
+I used Claude Code (Anthropic's Claude Opus 5) throughout: for probing the API, writing the analysis scripts and
+most of the frontend code, and drafting this README. The hypotheses, answers and findings were checked against the
+live data before they went in.
