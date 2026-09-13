@@ -1,122 +1,68 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react'
+import { Navigate, NavLink, Route, Routes } from 'react-router-dom'
+import * as api from './api.js'
+import { DataProvider, useData } from './DataContext.jsx'
+import Login from './pages/Login.jsx'
+import Listings from './pages/Listings.jsx'
+import ListingDetail from './pages/ListingDetail.jsx'
+import Saved from './pages/Saved.jsx'
+import Rentals from './pages/Rentals.jsx'
+import Projects from './pages/Projects.jsx'
+import Insights from './pages/Insights.jsx'
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [session, setSession] = useState(api.getSession)
+
+  useEffect(() => {
+    const onLogout = () => setSession(null)
+    window.addEventListener('ivy:logout', onLogout)
+    return () => window.removeEventListener('ivy:logout', onLogout)
+  }, [])
+
+  if (!session) return <Login onLogin={setSession} />
+
+  const signOut = async () => {
+    await api.logout()
+    setSession(null)
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <DataProvider key={session.user.email}>
+      <header className="topbar">
+        <strong className="brand">Ivy Homes · Pune</strong>
+        <nav>
+          <NavLink to="/listings">Listings</NavLink>
+          <NavLink to="/rentals">Rentals</NavLink>
+          <NavLink to="/projects">Projects</NavLink>
+          <NavLink to="/saved">Saved</NavLink>
+          <NavLink to="/insights">Insights</NavLink>
+        </nav>
+        <span className="user">
+          {session.user.email}
+          <button className="link" onClick={signOut}>Log out</button>
+        </span>
+      </header>
+      <main>
+        <Gate>
+          <Routes>
+            <Route path="/" element={<Navigate to="/listings" replace />} />
+            <Route path="/listings" element={<Listings />} />
+            <Route path="/listings/:id" element={<ListingDetail />} />
+            <Route path="/saved" element={<Saved />} />
+            <Route path="/rentals" element={<Rentals />} />
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/insights" element={<Insights />} />
+            <Route path="*" element={<p>Page not found.</p>} />
+          </Routes>
+        </Gate>
+      </main>
+    </DataProvider>
   )
 }
 
-export default App
+function Gate({ children }) {
+  const { status, error } = useData()
+  if (status === 'loading') return <p className="muted">Loading every listing, rental and project…</p>
+  if (status === 'error') return <p className="error">Could not load data: {error}</p>
+  return children
+}
