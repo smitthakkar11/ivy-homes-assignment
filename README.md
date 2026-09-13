@@ -118,7 +118,3 @@ did not use them.
   `src/data.js` built on the cases listed here.
 - Check the documented error codes I could not exercise with one key (403, 429).
 
-## Tools used
-
-Built with Claude Code (Claude Opus 5) as a pair: it ran the API probes and analysis scripts and wrote most of the
-code. I reviewed every finding and answer against the data before including it.
