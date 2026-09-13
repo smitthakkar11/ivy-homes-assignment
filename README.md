@@ -121,6 +121,6 @@ did not use them.
 
 ## LLM use
 
-I used Claude Code (Anthropic's Claude Opus 5) throughout: for probing the API, writing the analysis scripts and
-most of the frontend code, and drafting this README. The hypotheses, answers and findings were checked against the
+I used Claude Code (Anthropic's Claude Opus 5) : for probing the API, writing the analysis scripts and
+most of the frontend code. The hypotheses, answers and findings were checked against the
 live data before they went in.
