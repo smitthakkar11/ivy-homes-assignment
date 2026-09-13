@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Navigate, NavLink, Route, Routes } from 'react-router-dom'
 import * as api from './api.js'
 import { DataProvider, useData } from './DataContext.jsx'
+import { Loading } from './components.jsx'
 import Login from './pages/Login.jsx'
 import Listings from './pages/Listings.jsx'
 import ListingDetail from './pages/ListingDetail.jsx'
@@ -29,18 +30,20 @@ export default function App() {
   return (
     <DataProvider key={session.user.email}>
       <header className="topbar">
-        <strong className="brand">Ivy Homes · Pune</strong>
-        <nav>
-          <NavLink to="/listings">Listings</NavLink>
-          <NavLink to="/rentals">Rentals</NavLink>
-          <NavLink to="/projects">Projects</NavLink>
-          <NavLink to="/saved">Saved</NavLink>
-          <NavLink to="/insights">Insights</NavLink>
-        </nav>
-        <span className="user">
-          {session.user.email}
-          <button className="link" onClick={signOut}>Log out</button>
-        </span>
+        <div className="topbar-inner">
+          <strong className="brand"><span className="brand-mark">I</span>Ivy Homes · Pune</strong>
+          <nav>
+            <NavLink to="/listings">Listings</NavLink>
+            <NavLink to="/rentals">Rentals</NavLink>
+            <NavLink to="/projects">Projects</NavLink>
+            <NavLink to="/saved">Saved</NavLink>
+            <NavLink to="/insights">Insights</NavLink>
+          </nav>
+          <span className="user">
+            {session.user.email}
+            <button className="link" onClick={signOut}>Log out</button>
+          </span>
+        </div>
       </header>
       <main>
         <Gate>
@@ -62,7 +65,7 @@ export default function App() {
 
 function Gate({ children }) {
   const { status, error } = useData()
-  if (status === 'loading') return <p className="muted">Loading every listing, rental and project…</p>
+  if (status === 'loading') return <Loading>Loading every listing, rental and project…</Loading>
   if (status === 'error') return <p className="error">Could not load data: {error}</p>
   return children
 }

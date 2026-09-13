@@ -42,11 +42,15 @@ export default function Insights() {
 
   return (
     <>
-      <h2>Market insights · Pune</h2>
-      <p className="muted">
-        Figures below count each real property once: live listings only, with duplicates, suspected fakes and
-        impossible records removed ({s.clean.length.toLocaleString('en-IN')} properties).
-      </p>
+      <div className="page-head">
+        <div>
+          <h2>Market insights · Pune</h2>
+          <p className="muted">
+            Each real property counted once: live listings only, with duplicates, suspected fakes and impossible
+            records removed.
+          </p>
+        </div>
+      </div>
       <div className="stats">
         <Stat label="Live properties for sale" value={s.clean.length.toLocaleString('en-IN')} />
         <Stat label="Median asking price" value={formatInr(s.medianPrice)} />
@@ -54,64 +58,66 @@ export default function Insights() {
       </div>
 
       <div className="two-col">
-        <section>
+        <section className="panel table-wrap">
           <h3>By locality</h3>
           <table className="grid">
-            <thead><tr><th>Locality</th><th>Listings</th><th>Median price</th><th>Median ₹/sq ft</th></tr></thead>
+            <thead><tr><th>Locality</th><th className="num">Listings</th><th className="num">Median price</th><th className="num">Median ₹/sq ft</th></tr></thead>
             <tbody>
               {s.byLocality.map((r) => (
                 <tr key={r.k}>
                   <td><Link to={`/listings?locality=${encodeURIComponent(r.k)}`}>{titleCase(r.k)}</Link></td>
-                  <td>{r.count}</td><td>{formatInr(r.medianPrice)}</td><td>{pps(r.medianPps)}</td>
+                  <td className="num">{r.count}</td><td className="num">{formatInr(r.medianPrice)}</td><td className="num">{pps(r.medianPps)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </section>
-        <section>
+        <section className="panel table-wrap">
           <h3>By bedrooms</h3>
           <table className="grid">
-            <thead><tr><th>Bedrooms</th><th>Listings</th><th>Median price</th></tr></thead>
+            <thead><tr><th>Bedrooms</th><th className="num">Listings</th><th className="num">Median price</th></tr></thead>
             <tbody>
               {s.byBhk.map((r) => (
-                <tr key={r.k}><td>{r.k === 0 ? 'Plot' : `${r.k} BHK`}</td><td>{r.count}</td><td>{formatInr(r.medianPrice)}</td></tr>
+                <tr key={r.k}><td>{r.k === 0 ? 'Plot' : `${r.k} BHK`}</td><td className="num">{r.count}</td><td className="num">{formatInr(r.medianPrice)}</td></tr>
               ))}
             </tbody>
           </table>
         </section>
       </div>
 
-      <h3>What we found in the data</h3>
-      <ul className="findings">
-        <li>
-          <strong>{listings.length.toLocaleString('en-IN')} listing records describe only {uniqueProperties.toLocaleString('en-IN')} properties.</strong>{' '}
-          {s.dupes.length} records are the same flat re-posted, usually on another portal, under a slightly different building name.
-        </li>
-        <li>
-          <strong>{s.fake.length} listings look fake.</strong> They come from {fakeContacts.length} phone numbers
-          ({fakeContacts.join(', ')}) that each post under several agent names. All are marked verified, and they are priced
-          about {Math.round(s.fakeDiscount * 100)}% below the market. Some copy real listings at half the price.
-        </li>
-        <li>
-          <strong>{s.corrupt.length} listings describe something that cannot exist</strong>: negative prices, floors above the top floor,
-          carpet area bigger than the whole unit, flats with no bedrooms or bathrooms, dates in the future, swapped coordinates.
-        </li>
-        <li>
-          <strong>{(listings.length - s.live.length).toLocaleString('en-IN')} records are no longer live</strong> even though the
-          listings feed is documented to return active listings only.
-        </li>
-        <li>
-          <strong>{s.sqmCount} magichomes listings give area in square metres</strong> (everything they posted from 1 June 2026). Taken at face value those
-          flats look ten times smaller and ten times pricier per square foot. Areas here are converted.
-        </li>
-        <li>
-          <strong>{s.depositMonths} rentals give the deposit as a number of months</strong> (all zerobroker rentals), not rupees. Deposits here are converted.
-        </li>
-        <li>
-          <strong>Project prices are sent in lakhs or crores</strong>, not rupees, and <strong>{s.wrongProjects} of {projects.length} projects
-          report the wrong number of listings</strong>.
-        </li>
-      </ul>
+      <section className="panel" style={{ marginTop: 20 }}>
+        <h3>What we found in the data</h3>
+        <ul className="findings">
+          <li>
+            <strong>{listings.length.toLocaleString('en-IN')} listing records describe only {uniqueProperties.toLocaleString('en-IN')} properties.</strong>{' '}
+            {s.dupes.length} records are the same flat re-posted, usually on another portal, under a slightly different building name.
+          </li>
+          <li>
+            <strong>{s.fake.length} listings look fake.</strong> They come from {fakeContacts.length} phone numbers
+            ({fakeContacts.join(', ')}) that each post under several agent names. All are marked verified, and they are priced
+            about {Math.round(s.fakeDiscount * 100)}% below the market. Some copy real listings at half the price.
+          </li>
+          <li>
+            <strong>{s.corrupt.length} listings describe something that cannot exist</strong>: negative prices, floors above the top floor,
+            carpet area bigger than the whole unit, flats with no bedrooms or bathrooms, dates in the future, swapped coordinates.
+          </li>
+          <li>
+            <strong>{(listings.length - s.live.length).toLocaleString('en-IN')} records are no longer live</strong> even though the
+            listings feed is documented to return active listings only.
+          </li>
+          <li>
+            <strong>{s.sqmCount} magichomes listings give area in square metres</strong> (everything they posted from 1 June 2026). Taken at face value those
+            flats look ten times smaller and ten times pricier per square foot. Areas here are converted.
+          </li>
+          <li>
+            <strong>{s.depositMonths} rentals give the deposit as a number of months</strong> (all zerobroker rentals), not rupees. Deposits here are converted.
+          </li>
+          <li>
+            <strong>Project prices are sent in lakhs or crores</strong>, not rupees, and <strong>{s.wrongProjects} of {projects.length} projects
+            report the wrong number of listings</strong>.
+          </li>
+        </ul>
+      </section>
     </>
   )
 }

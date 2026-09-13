@@ -192,11 +192,12 @@ export function formatInr(v) {
   return `₹${v.toLocaleString('en-IN')}`
 }
 
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
 export function formatIst(isoLocal) {
   const [date, time] = isoLocal.split('T')
-  const d = new Date(`${date}T00:00:00Z`)
-  const day = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
-  return `${day}, ${time.slice(0, 5)} IST`
+  const [y, m, d] = date.split('-').map(Number)
+  return `${d} ${MONTHS[m - 1]} ${y}, ${time.slice(0, 5)} IST`
 }
 
 export const titleCase = (s) => s.replace(/\b\w/g, (c) => c.toUpperCase())

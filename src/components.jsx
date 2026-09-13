@@ -55,21 +55,34 @@ export function Flags({ listing }) {
   )
 }
 
+export const listingTitle = (l) =>
+  `${l.bedroom > 0 ? `${l.bedroom} BHK ` : ''}${titleCase(l.property_type)} in ${l.apartment_name}`
+
 export function ListingRow({ listing: l }) {
+  const isPlot = l.property_type === 'plot'
   return (
     <Link to={`/listings/${l.listing_id}`} className="card">
       <div className="card-main">
-        <div className="card-title">
-          {l.bedroom > 0 ? `${l.bedroom} BHK ` : ''}{titleCase(l.property_type)} · {l.apartment_name}
-        </div>
-        <div className="muted">
-          {titleCase(l.locality)} · {l.carpetSqft.toLocaleString('en-IN')} sq ft carpet · {titleCase(l.furnishing)} · posted {formatIst(l.postedAtIst)}
+        <div className="card-title">{listingTitle(l)}</div>
+        <div className="card-sub">{titleCase(l.locality)} · posted {formatIst(l.postedAtIst)}</div>
+        <div className="specs">
+          <span className="spec">{l.carpetSqft.toLocaleString('en-IN')} sq ft</span>
+          {!isPlot && <span className="spec">{l.bathroom} bath</span>}
+          {!isPlot && <span className="spec">Floor {l.floor}/{l.total_floors}</span>}
+          <span className="spec">{titleCase(l.furnishing)}</span>
+          <span className="spec">{titleCase(l.facing_direction)} facing</span>
         </div>
         <Flags listing={l} />
       </div>
       <div className="card-side">
-        <div className="price">{formatInr(l.price)}</div>
-        {l.price > 0 && <div className="muted small">₹{Math.round(l.price / l.carpetSqft).toLocaleString('en-IN')}/sq ft</div>}
+        <div>
+          <div className="price">{formatInr(l.price)}</div>
+          {l.price > 0 && (
+            <div className="muted small" style={{ textAlign: 'right' }}>
+              ₹{Math.round(l.price / l.carpetSqft).toLocaleString('en-IN')}/sq ft
+            </div>
+          )}
+        </div>
         <SaveButton id={l.listing_id} />
       </div>
     </Link>
@@ -88,4 +101,8 @@ export function Select({ label, value, onChange, options }) {
       </select>
     </label>
   )
+}
+
+export function Loading({ children }) {
+  return <div className="loading"><span className="spinner" />{children}</div>
 }

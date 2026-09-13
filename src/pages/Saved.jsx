@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useData } from '../DataContext.jsx'
-import { ListingRow } from '../components.jsx'
+import { ListingRow, Loading } from '../components.jsx'
 import * as api from '../api.js'
 
 export default function Saved() {
@@ -16,14 +16,19 @@ export default function Saved() {
   }, [savedIds])
 
   if (error) return <p className="error">{error}</p>
-  if (!serverIds) return <p className="muted">Loading saved listings…</p>
+  if (!serverIds) return <Loading>Loading saved listings…</Loading>
 
   return (
     <>
-      <h2>Saved listings ({serverIds.length})</h2>
+      <div className="page-head">
+        <div>
+          <h2>Saved listings</h2>
+          <p className="muted">{serverIds.length} saved to your account.</p>
+        </div>
+      </div>
       <div className="list">
         {serverIds.map((id) => byId.has(id) && <ListingRow key={id} listing={byId.get(id)} />)}
-        {serverIds.length === 0 && <p className="muted">Nothing saved yet. Use ☆ Save on any listing.</p>}
+        {serverIds.length === 0 && <div className="empty">Nothing saved yet. Use ☆ Save on any listing.</div>}
       </div>
     </>
   )

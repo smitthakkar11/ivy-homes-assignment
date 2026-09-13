@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useData } from '../DataContext.jsx'
 import { ListingRow, PAGE_SIZE, Pager, Select } from '../components.jsx'
@@ -41,43 +41,54 @@ export default function Listings() {
   }, [listings, f.flagged, f.inactive, f.dupes, f.locality, f.bhk, f.furnishing, f.min, f.max, f.sort])
 
   const page = Number(f.page) || 1
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [page])
   const rows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   return (
     <>
-      <h2>Properties for sale</h2>
-      <div className="filters">
-        <Select label="Locality" value={f.locality ?? ''} onChange={(v) => set('locality', v)} options={localities} />
-        <Select label="Bedrooms" value={f.bhk ?? ''} onChange={(v) => set('bhk', v)} options={[0, 1, 2, 3, 4, 5]} />
-        <Select label="Furnishing" value={f.furnishing ?? ''} onChange={(v) => set('furnishing', v)}
-          options={['unfurnished', 'semi-furnished', 'fully-furnished']} />
-        <label>
-          Min price (₹)
-          <input type="number" min="0" step="100000" value={f.min ?? ''} onChange={(e) => set('min', e.target.value)} />
-        </label>
-        <label>
-          Max price (₹)
-          <input type="number" min="0" step="100000" value={f.max ?? ''} onChange={(e) => set('max', e.target.value)} />
-        </label>
-        <label>
-          Sort
-          <select value={f.sort ?? 'newest'} onChange={(e) => set('sort', e.target.value)}>
-            <option value="newest">Newest</option>
-            <option value="price_asc">Price: low to high</option>
-            <option value="price_desc">Price: high to low</option>
-            <option value="area_desc">Largest first</option>
-          </select>
-        </label>
+      <div className="page-head">
+        <div>
+          <h2>Properties for sale</h2>
+          <p className="muted">Live listings in Pune, one per property, with fakes and impossible records hidden.</p>
+        </div>
       </div>
-      <div className="toggles">
-        <label><input type="checkbox" checked={!!f.inactive} onChange={(e) => set('inactive', e.target.checked && '1')} /> Include inactive</label>
-        <label><input type="checkbox" checked={!!f.dupes} onChange={(e) => set('dupes', e.target.checked && '1')} /> Include duplicate records</label>
-        <label><input type="checkbox" checked={!!f.flagged} onChange={(e) => set('flagged', e.target.checked && '1')} /> Include fake / impossible listings</label>
+      <div className="panel">
+        <div className="filters">
+          <Select label="Locality" value={f.locality ?? ''} onChange={(v) => set('locality', v)} options={localities} />
+          <Select label="Bedrooms" value={f.bhk ?? ''} onChange={(v) => set('bhk', v)} options={[1, 2, 3, 4, 5]} />
+          <Select label="Furnishing" value={f.furnishing ?? ''} onChange={(v) => set('furnishing', v)}
+            options={['unfurnished', 'semi-furnished', 'fully-furnished']} />
+          <label>
+            Min price (₹)
+            <input type="number" min="0" step="100000" value={f.min ?? ''} onChange={(e) => set('min', e.target.value)} />
+          </label>
+          <label>
+            Max price (₹)
+            <input type="number" min="0" step="100000" value={f.max ?? ''} onChange={(e) => set('max', e.target.value)} />
+          </label>
+          <label>
+            Sort
+            <select value={f.sort ?? 'newest'} onChange={(e) => set('sort', e.target.value)}>
+              <option value="newest">Newest</option>
+              <option value="price_asc">Price: low to high</option>
+              <option value="price_desc">Price: high to low</option>
+              <option value="area_desc">Largest first</option>
+            </select>
+          </label>
+        </div>
+        <div className="toggles">
+          <label><input type="checkbox" checked={!!f.inactive} onChange={(e) => set('inactive', e.target.checked && '1')} /> Include inactive</label>
+          <label><input type="checkbox" checked={!!f.dupes} onChange={(e) => set('dupes', e.target.checked && '1')} /> Include duplicate records</label>
+          <label><input type="checkbox" checked={!!f.flagged} onChange={(e) => set('flagged', e.target.checked && '1')} /> Include fake / impossible listings</label>
+          {params.toString() && <button className="link" onClick={() => setParams(new URLSearchParams())}>Clear all</button>}
+        </div>
       </div>
       <Pager page={page} total={filtered.length} onPage={(p) => set('page', p)} />
       <div className="list">
         {rows.map((l) => <ListingRow key={l.listing_id} listing={l} />)}
-        {rows.length === 0 && <p className="muted">No listings match these filters.</p>}
+        {rows.length === 0 && <div className="empty">No listings match these filters.</div>}
       </div>
       {filtered.length > PAGE_SIZE && <Pager page={page} total={filtered.length} onPage={(p) => set('page', p)} />}
     </>

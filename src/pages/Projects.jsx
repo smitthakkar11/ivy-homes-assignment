@@ -24,45 +24,55 @@ export default function Projects() {
 
   return (
     <>
-      <h2>Builder projects</h2>
-      <div className="filters">
-        <Select label="Locality" value={f.locality} onChange={(v) => set('locality', v)} options={localities} />
-        <Select label="Status" value={f.status} onChange={(v) => set('status', v)}
-          options={['new launch', 'under construction', 'ready to move']} />
-        <label>
-          Sort
-          <select value={f.sort} onChange={(e) => set('sort', e.target.value)}>
-            <option value="price_max">Costliest first</option>
-            <option value="price_min">Cheapest entry price</option>
-            <option value="possession">Earliest possession</option>
-          </select>
-        </label>
+      <div className="page-head">
+        <div>
+          <h2>Builder projects</h2>
+          <p className="muted">Price ranges converted to rupees, with each project's real number of live listings.</p>
+        </div>
+      </div>
+      <div className="panel">
+        <div className="filters">
+          <Select label="Locality" value={f.locality} onChange={(v) => set('locality', v)} options={localities} />
+          <Select label="Status" value={f.status} onChange={(v) => set('status', v)}
+            options={['new launch', 'under construction', 'ready to move']} />
+          <label>
+            Sort
+            <select value={f.sort} onChange={(e) => set('sort', e.target.value)}>
+              <option value="price_max">Costliest first</option>
+              <option value="price_min">Cheapest entry price</option>
+              <option value="possession">Earliest possession</option>
+            </select>
+          </label>
+        </div>
       </div>
       <Pager page={f.page} total={filtered.length} onPage={(p) => set('page', p)} />
       <div className="list">
         {rows.map((p) => (
           <div key={p.project_id} className="card">
             <div className="card-main">
-              <div className="card-title">{p.apartment_name} <span className="muted">by {p.developer_name}</span></div>
-              <div className="muted">
-                {titleCase(p.locality)} · {titleCase(p.project_status)} · {p.total_units} units in {p.total_towers} towers, {p.total_floors} floors ·
-                {' '}{p.min_area_sqft.toLocaleString('en-IN')}–{p.max_area_sqft.toLocaleString('en-IN')} sq ft
+              <div className="card-title">{p.apartment_name} <span className="muted" style={{ fontWeight: 400 }}>by {p.developer_name}</span></div>
+              <div className="card-sub">{titleCase(p.locality)} · launched {p.launch_date} · possession {p.possession_date}</div>
+              <div className="specs">
+                <span className="spec">{titleCase(p.project_status)}</span>
+                <span className="spec">{p.min_area_sqft.toLocaleString('en-IN')}–{p.max_area_sqft.toLocaleString('en-IN')} sq ft</span>
+                <span className="spec">{p.total_units.toLocaleString('en-IN')} units</span>
+                <span className="spec">{p.total_towers} towers · {p.total_floors} floors</span>
               </div>
-              <div className="muted small">
-                Launched {p.launch_date} · possession {p.possession_date} · RERA {p.rera_number} · {p.project_id}
-              </div>
-              <div className="small">
-                {p.actualListings} live listings
-                {p.listingCountWrong && (
-                  <span className="tag warn">project page claims {p.total_listings}</span>
-                )}
-              </div>
+              <div className="muted small">RERA {p.rera_number} · {p.project_id}</div>
+              <span className="flags">
+                <span className="tag ok">{p.actualListings} live listings</span>
+                {p.listingCountWrong && <span className="tag warn">project page claims {p.total_listings}</span>}
+              </span>
             </div>
             <div className="card-side">
-              <div className="price">{formatInr(p.priceMinInr)} – {formatInr(p.priceMaxInr)}</div>
+              <div style={{ textAlign: 'right' }}>
+                <div className="price">{formatInr(p.priceMinInr)} – {formatInr(p.priceMaxInr)}</div>
+                <div className="muted small">price range</div>
+              </div>
             </div>
           </div>
         ))}
+        {rows.length === 0 && <div className="empty">No projects match these filters.</div>}
       </div>
     </>
   )
